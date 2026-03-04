@@ -3,282 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent+ 项目 · 实验平台</title>
-    <!-- 添加 COS SDK -->
+    <title>Agent+ 实验 · 裁量决策平台</title>
+    <!-- COS SDK -->
     <script src="https://unpkg.com/cos-js-sdk-v5/dist/cos-js-sdk-v5.min.js"></script>
     <style>
-        /* 你的原有样式保持不变 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Microsoft YaHei', sans-serif;
-            background: #f0f2f5;
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #eef2f6;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            padding: 20px;
+            padding: 24px 20px;
         }
-        .container {
-            max-width: 1200px;
-            width: 100%;
-        }
-        .phase {
-            display: none;
-        }
-        .phase.active {
-            display: block;
-        }
+        .container { max-width: 1100px; width: 100%; }
+        .phase { display: none; }
+        .phase.active { display: block; }
         .card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-bottom: 20px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,20,40,0.12);
+            padding: 32px 36px;
+            margin-bottom: 24px;
         }
-        h1, h2, h3 {
-            color: #1e3a5f;
-        }
+        h1, h2, h3 { color: #0b2b4a; font-weight: 600; letter-spacing: -0.01em; }
         .header {
-            background: #1e3a5f;
+            background: #0b2b4a;
             color: white;
-            padding: 20px 30px;
-            border-radius: 16px 16px 0 0;
-            margin-bottom: 2px;
+            padding: 24px 36px;
+            border-radius: 28px 28px 0 0;
+            margin: -32px -36px 20px -36px;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 22px; }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #1e3a5f;
+            font-size: 0.95rem;
         }
         input, select {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e7ef;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border: 2px solid #dde5ed;
+            border-radius: 18px;
             font-size: 16px;
-            transition: 0.2s;
+            background: white;
+            transition: 0.15s;
         }
         input:focus, select:focus {
-            border-color: #1e3a5f;
+            border-color: #0b2b4a;
             outline: none;
+            box-shadow: 0 0 0 4px rgba(11,43,74,0.1);
         }
         .btn {
-            background: #1e3a5f;
+            background: #0b2b4a;
             color: white;
             border: none;
-            padding: 14px 28px;
+            padding: 16px 32px;
             border-radius: 40px;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
+            box-shadow: 0 8px 16px rgba(0,40,80,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .btn:hover {
-            background: #2b4b78;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            background: #133f64;
+            transform: translateY(-3px);
+            box-shadow: 0 14px 24px rgba(0,35,70,0.2);
         }
         .btn:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
+            background: #b0c4d9;
+            pointer-events: none;
+            opacity: 0.7;
             transform: none;
+            box-shadow: none;
         }
         .btn-secondary {
             background: white;
-            color: #1e3a5f;
-            border: 2px solid #1e3a5f;
+            color: #0b2b4a;
+            border: 2px solid #0b2b4a;
+            box-shadow: none;
         }
         .btn-secondary:hover {
-            background: #e8f0fe;
+            background: #e9f0f9;
+            transform: translateY(-2px);
         }
         .progress {
-            background: #e0e7ef;
-            height: 10px;
-            border-radius: 10px;
-            margin: 20px 0;
+            background: #e2eaf2;
+            height: 12px;
+            border-radius: 20px;
+            margin: 20px 0 32px;
         }
         .progress-bar {
-            background: #1e3a5f;
-            height: 10px;
-            border-radius: 10px;
+            background: #0b2b4a;
+            height: 12px;
+            border-radius: 20px;
             width: 0%;
-            transition: width 0.3s;
+            transition: width 0.3s ease;
         }
         .case-card {
-            background: #f8fafd;
-            border: 2px solid #e0e7ef;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
+            background: #f7fafd;
+            border: 2px solid #dbe5f0;
+            border-radius: 28px;
+            padding: 28px;
+            margin-bottom: 28px;
         }
         .case-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
+            gap: 14px;
             flex-wrap: wrap;
-            gap: 12px;
+            margin-bottom: 18px;
+            align-items: center;
         }
         .case-number {
-            background: #1e3a5f;
+            background: #0b2b4a;
             color: white;
-            padding: 6px 16px;
+            padding: 6px 18px;
             border-radius: 40px;
             font-weight: 600;
+            font-size: 0.9rem;
         }
         .case-type {
-            background: #e8f0fe;
-            color: #1e3a5f;
-            padding: 6px 16px;
+            background: #d4e2f0;
+            color: #0b2b4a;
+            padding: 6px 18px;
             border-radius: 40px;
             font-weight: 600;
         }
         .task-type {
-            background: #f39c12;
-            color: white;
-            padding: 6px 16px;
+            background: #f0b342;
+            color: #1e3a1e;
+            padding: 6px 18px;
             border-radius: 40px;
             font-weight: 600;
         }
         .case-desc {
             background: white;
-            padding: 16px;
-            border-radius: 12px;
-            margin: 16px 0;
+            padding: 20px 22px;
+            border-radius: 20px;
+            margin: 18px 0 20px;
+            border-left: 6px solid #0b2b4a;
             line-height: 1.6;
-            color: #34495e;
-            border-left: 4px solid #1e3a5f;
+            color: #1e293b;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
         }
+        .case-meta {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 14px;
+            background: #eef4fa;
+            padding: 18px 20px;
+            border-radius: 22px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+        /* 规则提示移到了题目上方，更突出 */
+        .rule-hint {
+            background: #fef6e6;
+            border: 2px solid #f3b33d;
+            border-radius: 18px;
+            padding: 14px 20px;
+            margin: 0 0 20px 0;      /* 上边距0，先于案例出现 */
+            color: #7b4a0c;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        /* 系统建议框：只保留建议内容，没有额外解释小字 */
         .system-advice {
-            background: #e3f2fd;
-            border: 2px solid #2196f3;
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin: 16px 0;
+            background: #e2f0fd;
+            border: 2px solid #1976d2;
+            border-radius: 22px;
+            padding: 16px 24px;
+            margin: 22px 0;
             position: relative;
+            color: #0b2b4a;           /* 统一深蓝色字体 */
+            font-size: 1.1rem;
+            font-weight: 500;
         }
         .system-advice::before {
             content: "🤖 系统建议";
             position: absolute;
-            top: -12px;
-            left: 20px;
-            background: #2196f3;
+            top: -14px;
+            left: 24px;
+            background: #1976d2;
             color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
             font-weight: 600;
+            letter-spacing: 0.3px;
         }
+        /* 错误建议不再用红色高亮，完全复用普通样式 */
         .system-advice.highlight-error {
-            background: #ffebee;
-            border-color: #f44336;
+            background: #e2f0fd;       /* 和普通建议一致 */
+            border-color: #1976d2;
         }
         .system-advice.highlight-error::before {
-            background: #f44336;
-            content: "⚠️ 系统建议 (注意)";
+            background: #1976d2;        /* 保持蓝色 */
+            content: "🤖 系统建议";
         }
-        .advice-content {
-            font-size: 16px;
-            color: #0d47a1;
-            margin: 8px 0;
-        }
-        .advice-explanation {
-            font-size: 14px;
-            color: #1565c0;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px dashed #bbdefb;
-        }
-        .rule-hint {
-            background: #fff3e0;
-            border: 2px solid #ff9800;
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin: 16px 0;
-            color: #e65100;
-        }
+
         .decision-options {
             display: flex;
-            gap: 24px;
-            margin: 20px 0;
+            gap: 32px;
+            margin: 30px 0 20px;
             flex-wrap: wrap;
         }
         .decision-option {
             flex: 1;
-            min-width: 200px;
+            min-width: 220px;
         }
         .decision-option input[type="radio"] {
-            width: auto;
-            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: #0b2b4a;
         }
         .decision-option label {
             display: inline;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 1.1rem;
         }
         .timer {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #1e3a5f;
+            background: #0b2b4a;
             color: white;
-            padding: 12px 24px;
+            padding: 12px 28px;
             border-radius: 40px;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
             z-index: 1000;
-        }
-        .error-badge {
-            background: #f44336;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin-left: 8px;
+            font-size: 1.2rem;
         }
         .scale-item {
-            margin: 20px 0;
+            margin: 30px 0;
+        }
+        .scale-options {
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            margin: 12px 0 8px;
+        }
+        .scale-options label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: 400;
+            flex: 1;
+        }
+        .scale-options input {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 6px;
         }
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            margin-top: 8px;
-            color: #7f8c8d;
-        }
-        .scale-options {
-            display: flex;
-            gap: 8px;
-            justify-content: space-between;
-        }
-        .scale-options input {
-            width: 40px;
-            height: 40px;
+            color: #4b6584;
+            font-size: 0.9rem;
+            padding: 0 8px;
         }
         .error-tip {
-            color: #f44336;
+            color: #c62828;
             font-size: 14px;
-            margin-top: 8px;
+            margin-top: 6px;
             display: none;
         }
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
-            color: #1e3a5f;
+            padding: 24px;
+            color: #0b2b4a;
         }
         .success-message {
-            background: #4caf50;
+            background: #2e7d32;
             color: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
+            padding: 14px;
+            border-radius: 40px;
+            margin: 20px 0 10px;
             display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+        #debriefing {
+            background: #e8f5e9;
+            border-radius: 24px;
+            padding: 24px;
+            line-height: 1.7;
+            margin-top: 32px;
         }
     </style>
 </head>
@@ -287,17 +305,17 @@
         <!-- 计时器 -->
         <div id="timer" class="timer" style="display: none;">00:00</div>
 
-        <!-- 阶段1：组别分配 & 前测问卷 -->
+        <!-- 阶段1：组别分配 + 前测 -->
         <div id="phase1" class="phase active">
             <div class="card">
                 <div class="header">
                     <h2>山东大学公共管理学院 · 实验研究</h2>
                 </div>
-                <div style="padding: 30px 0;">
+                <div style="padding: 10px 0 20px;">
                     <h3>知情同意书</h3>
                     <p style="margin: 20px 0; line-height: 1.8;">本研究由山东大学开展，目的在于了解基层公务人员在处理信访类案件时在不同信息条件下的判断特点。研究结果将用于学术研究，不涉及对个人的业务考核。</p>
-                    <p style="margin: 20px 0; line-height: 1.8;">本次实验不记录您的真实姓名，只使用系统自动生成的编号，研究数据将以汇总形式进行分析，不会用于任何个体评价。您在实验中的回答没有正确或错误，只存在不同的判断方式。</p>
-                    <p style="margin: 20px 0; line-height: 1.8;">完成本实验大约需要三十分钟，含填写简短问卷和若干情境判断题，感谢您的支持和参与！</p>
+                    <p style="margin: 20px 0; line-height: 1.8;">本次实验不记录您的真实姓名，只使用系统自动生成的编号，研究数据将以汇总形式进行分析。您在实验中的回答没有正确或错误，只存在不同的判断方式。</p>
+                    <p style="margin: 20px 0; line-height: 1.8;">完成本实验大约需要三十分钟，感谢您的支持和参与！</p>
                     
                     <hr style="margin: 30px 0;">
                     
@@ -351,21 +369,21 @@
             </div>
         </div>
 
-        <!-- 阶段2：实验说明（根据组别显示不同内容） -->
+        <!-- 阶段2：实验说明（组别） -->
         <div id="phase2" class="phase">
             <div class="card">
                 <h2 id="groupTitle"></h2>
-                <div id="groupInstruction" style="margin: 30px 0; line-height: 1.8; background: #f8fafd; padding: 20px; border-radius: 16px;"></div>
+                <div id="groupInstruction" style="margin: 30px 0; line-height: 1.8; background: #f8fafd; padding: 24px; border-radius: 24px;"></div>
                 <div id="taskInstruction" style="margin: 30px 0; line-height: 1.8;"></div>
                 <button class="btn" id="startQuestions">开始答题</button>
             </div>
         </div>
 
-        <!-- 阶段3：答题界面 -->
+        <!-- 阶段3：答题界面（所有任务均为裁量任务，规则提示在上方） -->
         <div id="phase3" class="phase">
             <div class="card">
                 <div class="progress">
-                    <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+                    <div class="progress-bar" id="progressBar"></div>
                 </div>
                 <div id="questionContainer"></div>
                 <div style="display: flex; justify-content: space-between; margin-top: 30px;">
@@ -375,85 +393,61 @@
             </div>
         </div>
 
-        <!-- 阶段4：结束问卷 -->
+        <!-- 阶段4：后测问卷 + 上传 -->
         <div id="phase4" class="phase">
             <div class="card">
                 <h2>实验结束 · 请填写反馈问卷</h2>
                 
                 <div class="scale-item">
                     <label>1. 对算法的信任度 (1=完全不信任, 7=完全信任)</label>
-                    <div class="scale-options" id="trustScale">
-                        <!-- 动态生成1-7 -->
-                    </div>
-                    <div class="scale-labels">
-                        <span>完全不信任</span>
-                        <span>完全信任</span>
-                    </div>
+                    <div class="scale-options" id="trustScale"></div>
+                    <div class="scale-labels"><span>完全不信任</span><span>完全信任</span></div>
                 </div>
-                
                 <div class="scale-item">
                     <label>2. 对算法的公平性感知 (1=非常不公平, 7=非常公平)</label>
                     <div class="scale-options" id="fairnessScale"></div>
-                    <div class="scale-labels">
-                        <span>非常不公平</span>
-                        <span>非常公平</span>
-                    </div>
+                    <div class="scale-labels"><span>非常不公平</span><span>非常公平</span></div>
                 </div>
-                
                 <div class="scale-item">
-                    <label>3. 责任归属感：出错时责任在？ (1=完全在我, 4=各占一半, 7=完全在系统/上级)</label>
+                    <label>3. 责任归属感：出错时责任在？ (1=完全在我, 4=各一半, 7=完全在系统/上级)</label>
                     <div class="scale-options" id="responsibilityScale"></div>
-                    <div class="scale-labels">
-                        <span>完全在我</span>
-                        <span>完全在系统/上级</span>
-                    </div>
+                    <div class="scale-labels"><span>完全在我</span><span>完全在系统/上级</span></div>
                 </div>
-                
                 <div class="scale-item">
                     <label>4. 对未来使用算法的意愿 (1=非常不愿意, 7=非常愿意)</label>
                     <div class="scale-options" id="willingnessScale"></div>
-                    <div class="scale-labels">
-                        <span>非常不愿意</span>
-                        <span>非常愿意</span>
-                    </div>
+                    <div class="scale-labels"><span>非常不愿意</span><span>非常愿意</span></div>
                 </div>
                 
-                <!-- 添加上传状态显示 -->
                 <div id="uploadStatus" class="success-message"></div>
-                
                 <button class="btn" id="submitExperiment" style="width: 100%; margin-top: 30px;">提交实验结果</button>
                 <div class="loading" id="loading">正在提交数据，请稍候...</div>
                 
-                <div id="debriefing" style="display: none; margin-top: 40px; padding: 20px; background: #e8f5e9; border-radius: 16px;">
+                <div id="debriefing" style="display: none; margin-top: 40px;">
                     <h3>实验后说明</h3>
-                    <p>感谢您的参与！为了保证研究的科学性，本实验在设计中对"系统建议"的准确性和呈现方式进行了人为控制，其中部分案件中，系统建议可能与我们预设的标准处理建议故意不一致，以便研究在系统出现错误时，公务人员的判断和态度变化。</p>
-                    <p>实验中的系统仅为研究用途，不代表目前任何实际工作中的政务系统表现，请您不必据此推断现实工作的考核要求。</p>
-                    <p>如您对研究设计或结果有兴趣，可以在实验结束后联系主试教师进一步交流。</p>
+                    <p>感谢您的参与！为了保证研究的科学性，本实验在设计中对“系统建议”的准确性进行了人为控制，其中部分案件中系统建议可能与常规判断不同，以便研究在系统出现偏差时公务人员的判断。实验中的系统仅为研究用途，不代表实际政务系统。</p>
+                    <p>如您对研究有兴趣，可联系主试教师交流。</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 配置（替换为你的实际地址）
-        const STS_URL = 'https://1407257663-66cybzxuq8.ap-shanghai.tencentscf.com';  // 你的云函数地址
-        
-        // COS配置（从云函数获取）
+        // 配置
+        const STS_URL = 'https://1407257663-66cybzxuq8.ap-shanghai.tencentscf.com'; // 你的云函数地址
         let cosConfig = null;
-        
-        // 年龄验证函数
-        function checkAge() {
-            const ageInput = document.getElementById('age');
-            const errorTip = document.getElementById('ageError');
-            const age = Number(ageInput.value);
 
-            if (isNaN(age) || age < 18 || age > 70) {
-                errorTip.style.display = 'block';
-                ageInput.style.borderColor = '#f44336';
+        // 年龄验证
+        function checkAge() {
+            const age = document.getElementById('age').value;
+            const err = document.getElementById('ageError');
+            if (!age || age < 18 || age > 70) {
+                err.style.display = 'block';
+                document.getElementById('age').style.borderColor = '#c62828';
                 return false;
             } else {
-                errorTip.style.display = 'none';
-                ageInput.style.borderColor = '#e0e7ef';
+                err.style.display = 'none';
+                document.getElementById('age').style.borderColor = '#dde5ed';
                 return true;
             }
         }
@@ -461,171 +455,113 @@
         // 全局变量
         let casesData = [];
         let currentPhase = 1;
-        let group = ''; // control, tool, rule
-        let explanationStyle = ''; // indicator, reason (仅对tool/rule组)
-        let questions = [];
+        let group = '';                // 'control', 'tool', 'rule'
+        let explanationStyle = '';      // 对于tool/rule: 'indicator' 或 'reason' (但不再显示解释小字，只影响分组标识)
+        let questions = [];             // 全部20题，统一为裁量任务，但保留taskType字段以区分左上角标识（实际可统一为裁量）
         let currentQuestionIndex = 0;
         let answers = [];
         let startTime = null;
         let timerInterval = null;
-        let participantId = 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-        
-        // 预设错误配置 (4道错误，其中1道离谱)
+        let participantId = 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+
+        // 预设错误案例 (4个, 其中1个离谱, 但不再做红色高亮)
         const errorConfig = {
             "C02": { correct: "列入重点督办名单", wrong: "暂不列入重点督办名单", isGlaring: false },
             "C07": { correct: "列入重点督办名单", wrong: "暂不列入重点督办名单", isGlaring: true },
             "C12": { correct: "列入重点督办名单", wrong: "暂不列入重点督办名单", isGlaring: false },
             "C14": { correct: "列入重点督办名单", wrong: "暂不列入重点督办名单", isGlaring: false }
         };
-        
-        // 模拟案例数据
+
+        // 模拟案例数据 (实际会加载cases.json, 这里内嵌3个样例 + 补充到20)
         const mockCasesData = [
-            {
-                "案件编号": "C01",
-                "领域": "民生保障",
-                "案件名称": "老旧小区改造信访件",
-                "简要案情描述": "某小区居民多次反映老旧小区改造进度缓慢，涉及300余户居民，舆情热度85分，风险评估分数75分，风险等级高，是否临近敏感时间节点：是，历史信访记录次数：15次，群众人数：320人，标准处理建议：列入重点督办名单"
-            },
-            {
-                "案件编号": "C02",
-                "领域": "城市管理",
-                "案件名称": "占道经营信访件",
-                "简要案情描述": "某街道商户占道经营严重，周边居民投诉频繁，舆情热度78分，风险评估分数72分，风险等级高，是否临近敏感时间节点：否，历史信访记录次数：8次，群众人数：150人，标准处理建议：列入重点督办名单"
-            },
-            {
-                "案件编号": "C03",
-                "领域": "教育资源",
-                "案件名称": "学区划分信访件",
-                "简要案情描述": "家长反映学区划分不合理，涉及5所学校，舆情热度65分，风险评估分数68分，风险等级中，是否临近敏感时间节点：是，历史信访记录次数：10次，群众人数：200人，标准处理建议：暂不列入重点督办名单"
-            }
+            { "案件编号": "C01", "领域": "民生保障", "案件名称": "老旧小区改造信访件", "简要案情描述": "某小区居民多次反映老旧小区改造进度缓慢，涉及300余户居民，舆情热度85分，风险评估分数75分，风险等级高，是否临近敏感时间节点：是，历史信访记录次数：15次，群众人数：320人，标准处理建议：列入重点督办名单" },
+            { "案件编号": "C02", "领域": "城市管理", "案件名称": "占道经营信访件", "简要案情描述": "某街道商户占道经营严重，周边居民投诉频繁，舆情热度78分，风险评估分数72分，风险等级高，是否临近敏感时间节点：否，历史信访记录次数：8次，群众人数：150人，标准处理建议：列入重点督办名单" },
+            { "案件编号": "C03", "领域": "教育资源", "案件名称": "学区划分信访件", "简要案情描述": "家长反映学区划分不合理，涉及5所学校，舆情热度65分，风险评估分数68分，风险等级中，是否临近敏感时间节点：是，历史信访记录次数：10次，群众人数：200人，标准处理建议：暂不列入重点督办名单" }
         ];
-        
-        // 加载案例数据
+
+        // 加载案例
         async function loadCases() {
             try {
                 const response = await fetch('./cases.json');
-                if (!response.ok) throw new Error('无法加载案例数据');
+                if (!response.ok) throw new Error('load fail');
                 casesData = await response.json();
-            } catch (error) {
-                console.error('加载失败，使用模拟数据:', error);
+            } catch (e) {
+                console.warn('使用模拟案例数据');
                 casesData = [...mockCasesData];
-                // 补充到20个模拟案例
+                // 补齐至20个
                 for (let i = 4; i <= 20; i++) {
-                    const caseNum = `C${i.toString().padStart(2, '0')}`;
+                    const num = `C${i.toString().padStart(2,'0')}`;
                     casesData.push({
-                        "案件编号": caseNum,
-                        "领域": i % 3 === 0 ? "民生保障" : i % 3 === 1 ? "城市管理" : "教育资源",
+                        "案件编号": num,
+                        "领域": i%3===0? "民生保障" : (i%3===1? "城市管理":"教育资源"),
                         "案件名称": `模拟案件${i}`,
-                        "简要案情描述": `模拟案件${i}的简要描述，用于测试`,
-                        "群众人数": Math.floor(Math.random() * 300 + 50),
-                        "网络舆情热度（分）": Math.floor(Math.random() * 100),
-                        "历史信访记录次数（次）": Math.floor(Math.random() * 20),
-                        "风险评估分数（分）": Math.floor(Math.random() * 100),
-                        "风险等级": Math.random() > 0.5 ? "高" : "中",
-                        "是否临近敏感时间节点": Math.random() > 0.5 ? "是" : "否",
-                        "标准处理建议": Math.random() > 0.5 ? "列入重点督办名单" : "暂不列入重点督办名单"
+                        "简要案情描述": `这是模拟案件${i}的简要描述，包含一定风险信息。`,
+                        "群众人数": Math.floor(Math.random()*200+80),
+                        "网络舆情热度（分）": Math.floor(Math.random()*100),
+                        "历史信访记录次数（次）": Math.floor(Math.random()*20),
+                        "风险评估分数（分）": Math.floor(Math.random()*100),
+                        "风险等级": Math.random()>0.5? "高":"中",
+                        "是否临近敏感时间节点": Math.random()>0.5? "是":"否",
+                        "标准处理建议": Math.random()>0.5? "列入重点督办名单":"暂不列入重点督办名单"
                     });
                 }
             }
             initQuestions();
         }
-        
-        // 初始化题目
+
+        // 初始化题目：全部作为裁量任务，但左上角统一显示为“裁量决策任务”
         function initQuestions() {
-            const quantTasks = casesData.slice(0, 10).map(c => ({
+            // 所有20个案例都设为裁量任务，左上角标识统一，规则提示也统一为裁量规则
+            questions = casesData.slice(0, 20).map(c => ({
                 ...c,
-                taskType: 'quant',
-                ruleHint: '风险评估指数超过70，则原则上应重点督办'
+                taskType: 'discretion'   // 全部裁量
             }));
-            
-            const discretionTasks = casesData.slice(10, 20).map(c => ({
-                ...c,
-                taskType: 'discretion',
-                ruleHint: '你需要综合考虑群众感受、稳定风险、资源有限性等，自行判断是否重点督办'
-            }));
-            
-            // 合并并打乱
-            questions = [...quantTasks, ...discretionTasks];
-            for (let i = questions.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+            // 随机打乱顺序
+            for (let i = questions.length-1; i>0; i--) {
+                const j = Math.floor(Math.random()*(i+1));
                 [questions[i], questions[j]] = [questions[j], questions[i]];
             }
-            
             answers = new Array(questions.length).fill(null);
         }
-        
-        // 获取系统建议
-        function getSystemAdvice(caseNumber, originalSuggestion) {
-            if (errorConfig[caseNumber]) {
-                return errorConfig[caseNumber].wrong;
-            }
-            return originalSuggestion;
+
+        // 获取系统建议（可能错误）
+        function getSystemAdvice(caseNumber, original) {
+            return errorConfig[caseNumber] ? errorConfig[caseNumber].wrong : original;
         }
-        
-        // 判断是否为错误案例
+
         function isErrorCase(caseNumber) {
             return !!errorConfig[caseNumber];
         }
-        
-        // 判断是否为离谱错误
         function isGlaringError(caseNumber) {
             return errorConfig[caseNumber] && errorConfig[caseNumber].isGlaring;
         }
-        
-        // 获取正确建议
-        function getCorrectSuggestion(caseNumber, originalSuggestion) {
-            if (errorConfig[caseNumber]) {
-                return errorConfig[caseNumber].correct;
-            }
-            return originalSuggestion;
+        function getCorrectSuggestion(caseNumber, original) {
+            return errorConfig[caseNumber] ? errorConfig[caseNumber].correct : original;
         }
-        
-        // 生成解释文本
-        function getExplanation(caseData, style) {
-            const riskScore = caseData['风险评估分数（分）'];
-            
-            if (style === 'indicator') {
-                return `综合评分: ${riskScore}分 | 群众人数: ${caseData['群众人数']}人 | 舆情热度: ${caseData['网络舆情热度（分）']}分 | 信访次数: ${caseData['历史信访记录次数（次）']}次`;
-            } else {
-                if (riskScore >= 70) {
-                    return `理由：风险评估分数${riskScore}分（超过70分阈值），且${caseData['是否临近敏感时间节点'] === '是' ? '临近敏感时间节点' : '结合群众人数和历史信访记录'}，建议重点督办。`;
-                } else {
-                    return `理由：风险评估分数${riskScore}分（低于70分阈值），${caseData['是否临近敏感时间节点'] === '是' ? '虽临近敏感时间节点但' : ''}风险可控，建议暂不列入重点督办。`;
-                }
-            }
-        }
-        
-        // 开始计时
+
+        // 不再生成额外解释小字，只保留建议文本
+
+        // 计时
         function startTimer() {
             startTime = new Date();
-            timerInterval = setInterval(updateTimer, 1000);
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!startTime) return;
+                const diff = Math.floor((new Date() - startTime)/1000);
+                const m = Math.floor(diff/60).toString().padStart(2,'0');
+                const s = (diff%60).toString().padStart(2,'0');
+                document.getElementById('timer').textContent = `${m}:${s}`;
+            }, 1000);
         }
-        
-        // 更新计时器
-        function updateTimer() {
-            if (!startTime) return;
-            const now = new Date();
-            const diff = Math.floor((now - startTime) / 1000);
-            const minutes = Math.floor(diff / 60);
-            const seconds = diff % 60;
-            document.getElementById('timer').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-        
-        // 停止计时
         function stopTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
         }
-        
-        // 切换阶段
+
         function goToPhase(phase) {
             document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
             document.getElementById(`phase${phase}`).classList.add('active');
             currentPhase = phase;
-            
             if (phase === 3) {
                 document.getElementById('timer').style.display = 'block';
                 startTimer();
@@ -635,354 +571,224 @@
                 stopTimer();
             }
         }
-        
-        // 渲染当前题目
+
+        // 渲染题目
         function renderQuestion() {
-            if (questions.length === 0) return;
-            
+            if (!questions.length) return;
             const q = questions[currentQuestionIndex];
             const isError = isErrorCase(q['案件编号']);
-            const isGlaring = isGlaringError(q['案件编号']);
-            const systemAdvice = getSystemAdvice(q['案件编号'], q['标准处理建议']);
-            
+            const sysAdvice = getSystemAdvice(q['案件编号'], q['标准处理建议']);
+
+            // 规则提示（统一为裁量规则），放在最上面
             let html = `
                 <div class="case-card">
+                    <div class="rule-hint">📌 裁量决策规则：你需要综合考虑群众感受、稳定风险、资源有限性等因素，自行判断是否列入重点督办名单。</div>
+                    
                     <div class="case-header">
                         <span class="case-number">${q['案件编号']}</span>
                         <span class="case-type">${q['领域']}</span>
-                        <span class="task-type">${q.taskType === 'quant' ? '📊 量化决策任务' : '⚖️ 裁量决策任务'}</span>
+                        <span class="task-type">⚖️ 裁量决策任务</span>
                     </div>
                     
                     <h3>${q['案件名称']}</h3>
+                    <div class="case-desc">${q['简要案情描述']}</div>
                     
-                    <div class="case-desc">
-                        ${q['简要案情描述']}
-                    </div>
-                    
-                    <div class="case-meta" style="display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 16px 0;">
-                        <div>👥 群众人数: ${q['群众人数']}</div>
-                        <div>🔥 舆情热度: ${q['网络舆情热度（分）']}</div>
-                        <div>📝 信访次数: ${q['历史信访记录次数（次）']}</div>
-                        <div>📊 风险分数: ${q['风险评估分数（分）']}</div>
-                        <div>⚠️ 风险等级: ${q['风险等级']}</div>
+                    <div class="case-meta">
+                        <div>👥 群众: ${q['群众人数']}</div>
+                        <div>🔥 舆情: ${q['网络舆情热度（分）']}</div>
+                        <div>📝 信访: ${q['历史信访记录次数（次）']}</div>
+                        <div>📊 风险分: ${q['风险评估分数（分）']}</div>
+                        <div>⚠️ 等级: ${q['风险等级']}</div>
                         <div>📅 敏感节点: ${q['是否临近敏感时间节点']}</div>
                     </div>
             `;
-            
-            // 规则提示
-            if (q.taskType === 'quant') {
-                html += `<div class="rule-hint">📌 量化规则：风险评估指数超过70，则原则上应重点督办</div>`;
-            } else {
-                html += `<div class="rule-hint">📌 裁量规则：你需要综合考虑群众感受、稳定风险、资源有限性等，自行判断是否重点督办</div>`;
-            }
-            
-            // 系统建议
+
+            // 系统建议 (非控制组才显示) — 只有一句话，无小字，错误也是蓝色
             if (group !== 'control') {
-                const adviceClass = isGlaring ? 'system-advice highlight-error' : 'system-advice';
-                html += `<div class="${adviceClass}">`;
-                html += `<div class="advice-content">${systemAdvice}</div>`;
-                
-                if (explanationStyle) {
-                    html += `<div class="advice-explanation">${getExplanation(q, explanationStyle)}</div>`;
-                }
-                
-                if (isGlaring) {
-                    html += `<div style="color:#f44336; font-size:12px; margin-top:8px;">⚠️ 注意：此建议与常规判断可能存在差异</div>`;
-                }
-                
-                html += `</div>`;
+                // 即使是glaring错误，也用相同样式 (不再使用highlight-error类)
+                html += `<div class="system-advice">${sysAdvice}</div>`;
             }
-            
+
             // 决策选项
             html += `
                 <div class="decision-options">
                     <div class="decision-option">
-                        <input type="radio" name="decision" value="列入重点督办名单" id="decide_yes" 
-                            ${answers[currentQuestionIndex] === '列入重点督办名单' ? 'checked' : ''}>
-                        <label for="decide_yes">✅ 列入重点督办名单</label>
+                        <input type="radio" name="decision" value="列入重点督办名单" id="yes_${currentQuestionIndex}" ${answers[currentQuestionIndex]==='列入重点督办名单'?'checked':''}>
+                        <label for="yes_${currentQuestionIndex}">✅ 列入重点督办名单</label>
                     </div>
                     <div class="decision-option">
-                        <input type="radio" name="decision" value="暂不列入重点督办名单" id="decide_no"
-                            ${answers[currentQuestionIndex] === '暂不列入重点督办名单' ? 'checked' : ''}>
-                        <label for="decide_no">❌ 暂不列入重点督办名单</label>
+                        <input type="radio" name="decision" value="暂不列入重点督办名单" id="no_${currentQuestionIndex}" ${answers[currentQuestionIndex]==='暂不列入重点督办名单'?'checked':''}>
+                        <label for="no_${currentQuestionIndex}">❌ 暂不列入重点督办名单</label>
                     </div>
                 </div>
+                <div style="text-align:right; color:#4b6584;">${currentQuestionIndex+1} / ${questions.length}</div>
             `;
-            
-            // 进度显示
-            html += `<div style="text-align: right; color: #7f8c8d; margin-top: 16px;">${currentQuestionIndex + 1} / ${questions.length}</div>`;
-            
+
             document.getElementById('questionContainer').innerHTML = html;
-            
-            // 更新进度条
-            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-            document.getElementById('progressBar').style.width = progress + '%';
-            
-            // 更新按钮状态
+            document.getElementById('progressBar').style.width = ((currentQuestionIndex+1)/questions.length*100)+'%';
             document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
-            document.getElementById('nextBtn').textContent = currentQuestionIndex === questions.length - 1 ? '提交答题' : '下一题';
+            document.getElementById('nextBtn').textContent = currentQuestionIndex===questions.length-1 ? '提交答题' : '下一题';
         }
-        
-        // 保存当前答案
+
         function saveCurrentAnswer() {
             const selected = document.querySelector('input[name="decision"]:checked');
-            if (selected) {
-                answers[currentQuestionIndex] = selected.value;
-            }
+            if (selected) answers[currentQuestionIndex] = selected.value;
         }
-        
-        // 检查是否所有题目都答了
-        function allQuestionsAnswered() {
-            return answers.every(a => a !== null);
+
+        function allAnswered() {
+            return answers.every(a => a != null);
         }
-        
+
         // 初始化量表
         function initScales() {
-            const scales = ['trust', 'fairness', 'responsibility', 'willingness'];
-            scales.forEach(scale => {
-                const container = document.getElementById(`${scale}Scale`);
-                container.innerHTML = '';
-                for (let i = 1; i <= 7; i++) {
-                    container.innerHTML += `
-                        <label style="display: flex; flex-direction: column; align-items: center;">
-                            <input type="radio" name="${scale}" value="${i}">
-                            <span>${i}</span>
-                        </label>
-                    `;
+            ['trust','fairness','responsibility','willingness'].forEach(id => {
+                const cont = document.getElementById(id+'Scale');
+                cont.innerHTML = '';
+                for (let i=1; i<=7; i++) {
+                    cont.innerHTML += `<label><input type="radio" name="${id}" value="${i}"><span>${i}</span></label>`;
                 }
             });
         }
 
-        // 获取COS配置
+        // COS上传逻辑
         async function getCosConfig() {
             if (cosConfig) return cosConfig;
-            
-            try {
-                const response = await fetch(STS_URL);
-                if (!response.ok) throw new Error('获取配置失败');
-                cosConfig = await response.json();
-                return cosConfig;
-            } catch (error) {
-                console.error('获取COS配置失败:', error);
-                throw error;
-            }
+            const res = await fetch(STS_URL);
+            if (!res.ok) throw new Error('获取sts失败');
+            cosConfig = await res.json();
+            return cosConfig;
         }
 
-        // 上传数据到COS
         async function uploadToCOS(data) {
-            try {
-                // 获取COS配置
-                const config = await getCosConfig();
-                
-                // 初始化COS客户端
-                const cos = new COS({
-                    SecretId: config.secretId,
-                    SecretKey: config.secretKey
-                });
-                
-                // 生成文件名
-                const fileName = `survey/${participantId}_${Date.now()}.json`;
-                
-                // 准备文件内容
-                const fileContent = JSON.stringify(data, null, 2);
-                
-                // 显示上传状态
-                document.getElementById('uploadStatus').style.display = 'block';
-                document.getElementById('uploadStatus').textContent = '正在上传数据...';
-                document.getElementById('uploadStatus').style.backgroundColor = '#2196f3';
-                
-                // 上传文件
-                return new Promise((resolve, reject) => {
-                    cos.putObject({
-                        Bucket: config.bucket,
-                        Region: config.region,
-                        Key: fileName,
-                        Body: fileContent,
-                        ContentType: 'application/json'
-                    }, (err, result) => {
-                        if (err) {
-                            console.error('上传失败:', err);
-                            reject(err);
-                        } else {
-                            console.log('上传成功:', result);
-                            resolve(result);
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error('上传过程出错:', error);
-                throw error;
-            }
+            const config = await getCosConfig();
+            const cos = new COS({ SecretId: config.secretId, SecretKey: config.secretKey });
+            const fileName = `survey/${participantId}_${Date.now()}.json`;
+            const body = JSON.stringify(data, null, 2);
+            document.getElementById('uploadStatus').style.display = 'block';
+            document.getElementById('uploadStatus').textContent = '上传中……';
+            return new Promise((resolve, reject) => {
+                cos.putObject({
+                    Bucket: config.bucket,
+                    Region: config.region,
+                    Key: fileName,
+                    Body: body,
+                    ContentType: 'application/json'
+                }, (err, result) => err ? reject(err) : resolve(result));
+            });
         }
 
-        // 提交数据
         async function submitData() {
-            // 收集所有数据
-            const participantData = {
-                participantId: participantId,
-                group,
-                explanationStyle,
-                startTime: startTime ? startTime.toISOString() : new Date().toISOString(),
+            const post = {
+                trust: document.querySelector('input[name="trust"]:checked')?.value,
+                fairness: document.querySelector('input[name="fairness"]:checked')?.value,
+                responsibility: document.querySelector('input[name="responsibility"]:checked')?.value,
+                willingness: document.querySelector('input[name="willingness"]:checked')?.value
+            };
+            const data = {
+                participantId, group, explanationStyle,
+                startTime: startTime?.toISOString(),
                 endTime: new Date().toISOString(),
-                duration: startTime ? Math.floor((new Date() - startTime) / 1000) : 0,
                 demographics: {
                     age: document.getElementById('age').value,
                     gender: document.getElementById('gender').value,
                     govExp: document.getElementById('govExp').value,
                     aiExp: document.getElementById('aiExp').value
                 },
-                answers: questions.map((q, i) => ({
+                answers: questions.map((q,i) => ({
                     caseNumber: q['案件编号'],
-                    taskType: q.taskType,
                     participantDecision: answers[i],
-                    systemAdvice: group !== 'control' ? getSystemAdvice(q['案件编号'], q['标准处理建议']) : null,
+                    systemAdvice: group!=='control' ? getSystemAdvice(q['案件编号'], q['标准处理建议']) : null,
                     correctAdvice: q['标准处理建议'],
-                    isErrorCase: isErrorCase(q['案件编号']),
-                    isGlaringError: isGlaringError(q['案件编号'])
+                    isErrorCase: isErrorCase(q['案件编号'])
                 })),
-                postQuestionnaire: {
-                    trust: document.querySelector('input[name="trust"]:checked')?.value,
-                    fairness: document.querySelector('input[name="fairness"]:checked')?.value,
-                    responsibility: document.querySelector('input[name="responsibility"]:checked')?.value,
-                    willingness: document.querySelector('input[name="willingness"]:checked')?.value
-                }
+                postQuestionnaire: post
             };
-            
-            // 上传到COS
-            await uploadToCOS(participantData);
-            
-            return participantData;
+            await uploadToCOS(data);
+            return data;
         }
-        
-        // 事件监听
+
+        // 事件绑定
         document.addEventListener('DOMContentLoaded', async () => {
             await loadCases();
             initScales();
-            
-            // 开始实验按钮
+
             document.getElementById('startExperiment').addEventListener('click', () => {
-                // 验证表单
                 if (!checkAge()) return;
-                
-                const required = ['gender', 'government', 'govExp', 'aiExp'];
-                for (let field of required) {
-                    if (!document.getElementById(field).value) {
-                        alert(`请填写完整${document.querySelector(`label[for="${field}"]`)?.textContent || field}信息`);
+                const fields = ['gender','government','govExp','aiExp'];
+                for (let f of fields) {
+                    if (!document.getElementById(f).value) {
+                        alert('请填写所有基本信息');
                         return;
                     }
                 }
-                
-                // 随机分配组别
-                const rand = Math.random();
-                if (rand < 0.2) {
-                    group = 'control';
-                    explanationStyle = null;
-                } else if (rand < 0.6) {
-                    group = 'tool';
-                    explanationStyle = Math.random() < 0.5 ? 'indicator' : 'reason';
-                } else {
-                    group = 'rule';
-                    explanationStyle = Math.random() < 0.5 ? 'indicator' : 'reason';
-                }
-                
-                // 显示说明
-                const groupTitle = document.getElementById('groupTitle');
-                const groupInstruction = document.getElementById('groupInstruction');
-                const taskInstruction = document.getElementById('taskInstruction');
-                
+                // 随机分组
+                const r = Math.random();
+                if (r < 0.2) { group = 'control'; explanationStyle = ''; }
+                else if (r < 0.6) { group = 'tool'; explanationStyle = Math.random()<0.5?'indicator':'reason'; }
+                else { group = 'rule'; explanationStyle = Math.random()<0.5?'indicator':'reason'; }
+
+                const gTitle = document.getElementById('groupTitle');
+                const gInst = document.getElementById('groupInstruction');
                 if (group === 'control') {
-                    groupTitle.textContent = '控制组 · 无算法辅助';
-                    groupInstruction.innerHTML = '在接下来的题目中，您只会看到案件信息，不会看到任何系统给出的"建议"，请完全依据您个人的判断，做出是否重点督办的决定。';
+                    gTitle.textContent = '控制组 · 无算法辅助';
+                    gInst.innerHTML = '您只会看到案件信息，没有系统建议，请完全依据个人判断。';
                 } else if (group === 'tool') {
-                    groupTitle.textContent = '工具组 · 风险分析助手' + (explanationStyle === 'indicator' ? ' (指标式解释)' : ' (理由式解释)');
-                    groupInstruction.innerHTML = '在接下来的题目中，除案件信息外，您还会看到一个"风险分析助手"给出的建议。该助手系统由高校科研团队开发，主要功能是根据既定模型，对案件的风险进行综合分析，并给出推荐处理方案。系统的建议仅供参考，最终决定完全由您做出。';
+                    gTitle.textContent = '工具组 · 风险分析助手';
+                    gInst.innerHTML = '您会看到一个“风险分析助手”给出的建议，仅供参考，最终决定由您做出。';
                 } else {
-                    groupTitle.textContent = '规则化他者组 · 上级部门评估系统' + (explanationStyle === 'indicator' ? ' (指标式解释)' : ' (理由式解释)');
-                    groupInstruction.innerHTML = '在接下来的题目中，除案件信息外，您还会看到一个"上级部门重点督办评估系统"给出的建议。本系统体现上级主管部门制定的风险评估规则与考核导向，一般要求基层工作尽量与系统建议保持一致。';
+                    gTitle.textContent = '规则化他者组 · 上级部门评估系统';
+                    gInst.innerHTML = '您会看到一个“上级部门重点督办评估系统”的建议，一般建议尽量与系统保持一致。';
                 }
-                
-                taskInstruction.innerHTML = '题目包含量化决策任务和裁量决策任务，将随机混合呈现。';
-                
+                document.getElementById('taskInstruction').innerHTML = '所有任务均为裁量决策任务，请先阅读上方的规则提示，再阅读案例并判断。';
                 goToPhase(2);
             });
-            
-            // 开始答题按钮
-            document.getElementById('startQuestions').addEventListener('click', () => {
-                goToPhase(3);
-            });
-            
-            // 上一题
+
+            document.getElementById('startQuestions').addEventListener('click', () => goToPhase(3));
             document.getElementById('prevBtn').addEventListener('click', () => {
                 saveCurrentAnswer();
-                if (currentQuestionIndex > 0) {
-                    currentQuestionIndex--;
-                    renderQuestion();
-                }
+                if (currentQuestionIndex>0) { currentQuestionIndex--; renderQuestion(); }
             });
-            
-            // 下一题
             document.getElementById('nextBtn').addEventListener('click', () => {
                 saveCurrentAnswer();
-                
-                if (currentQuestionIndex < questions.length - 1) {
+                if (currentQuestionIndex < questions.length-1) {
                     currentQuestionIndex++;
                     renderQuestion();
                 } else {
-                    if (allQuestionsAnswered()) {
+                    if (allAnswered()) {
                         stopTimer();
                         goToPhase(4);
-                    } else {
-                        alert('请完成所有题目后再提交');
-                    }
+                    } else alert('请完成所有题目');
                 }
             });
-            
-            // 提交实验
+
             document.getElementById('submitExperiment').addEventListener('click', async () => {
-                // 验证量表
-                const scales = ['trust', 'fairness', 'responsibility', 'willingness'];
-                for (let scale of scales) {
-                    if (!document.querySelector(`input[name="${scale}"]:checked`)) {
-                        alert(`请完成第${scales.indexOf(scale)+1}个量表评分`);
+                const scales = ['trust','fairness','responsibility','willingness'];
+                for (let s of scales) {
+                    if (!document.querySelector(`input[name="${s}"]:checked`)) {
+                        alert('请完成后测所有题目');
                         return;
                     }
                 }
-
-                // 显示加载状态
                 document.getElementById('submitExperiment').style.display = 'none';
                 document.getElementById('loading').style.display = 'block';
-                
                 try {
-                    // 提交数据到COS
                     await submitData();
-                    
-                    // 显示成功
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('uploadStatus').style.display = 'block';
-                    document.getElementById('uploadStatus').textContent = '✅ 数据提交成功！感谢您的参与。';
-                    document.getElementById('uploadStatus').style.backgroundColor = '#4caf50';
+                    document.getElementById('uploadStatus').textContent = '✅ 数据提交成功！感谢参与。';
+                    document.getElementById('uploadStatus').style.background = '#2e7d32';
                     document.getElementById('debriefing').style.display = 'block';
-                    
-                } catch (error) {
-                    console.error('提交失败:', error);
-                    
-                    // 显示失败，并提供下载备份
+                } catch (err) {
+                    console.error(err);
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('submitExperiment').style.display = 'block';
-                    
-                    // 询问是否下载备份
-                    if (confirm('提交失败，是否下载数据文件备份？')) {
-                        const data = await submitData(); // 重新收集数据
-                        const dataStr = JSON.stringify(data, null, 2);
-                        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                        const url = URL.createObjectURL(dataBlob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `实验数据_${participantId}.json`;
-                        link.click();
-                        URL.revokeObjectURL(url);
-                        
-                        alert('数据已下载到本地，请将文件发送给管理员。');
+                    if (confirm('上传失败，是否下载备份文件？')) {
+                        const backup = await submitData(); // 重新收集
+                        const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'});
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `backup_${participantId}.json`;
+                        a.click();
                     }
                 }
             });
