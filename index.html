@@ -369,10 +369,10 @@
             </div>
         </div>
 
-        <!-- 阶段2：实验说明（组别） -->
+        <!-- 阶段2：实验说明（组别）—— 组名已改为“第一组”“第二组”“第三组” -->
         <div id="phase2" class="phase">
             <div class="card">
-                <h2 id="groupTitle"></h2>
+                <h2 id="groupTitle"></h2>   <!-- 这里只显示“第一组”等简短名称，不加解释性后缀 -->
                 <div id="groupInstruction" style="margin: 30px 0; line-height: 1.8; background: #f8fafd; padding: 24px; border-radius: 24px;"></div>
                 <div id="taskInstruction" style="margin: 30px 0; line-height: 1.8;"></div>
                 <button class="btn" id="startQuestions">开始答题</button>
@@ -455,7 +455,7 @@
         // 全局变量
         let casesData = [];
         let currentPhase = 1;
-        let group = '';                // 'control', 'tool', 'rule'
+        let group = '';                // 'control', 'tool', 'rule' 映射为第一、二、三组
         let explanationStyle = '';      // 对于tool/rule: 'indicator' 或 'reason' (但不再显示解释小字，只影响分组标识)
         let questions = [];             // 全部20题，统一为裁量任务，但保留taskType字段以区分左上角标识（实际可统一为裁量）
         let currentQuestionIndex = 0;
@@ -721,22 +721,28 @@
                         return;
                     }
                 }
-                // 随机分组
+                // 随机分组: 第一组(控制组), 第二组(工具组), 第三组(规则组)
                 const r = Math.random();
-                if (r < 0.2) { group = 'control'; explanationStyle = ''; }
-                else if (r < 0.6) { group = 'tool'; explanationStyle = Math.random()<0.5?'indicator':'reason'; }
-                else { group = 'rule'; explanationStyle = Math.random()<0.5?'indicator':'reason'; }
+                if (r < 0.2) { 
+                    group = 'control'; 
+                    explanationStyle = ''; 
+                    document.getElementById('groupTitle').textContent = '第一组';
+                } else if (r < 0.6) { 
+                    group = 'tool'; 
+                    explanationStyle = Math.random()<0.5?'indicator':'reason'; 
+                    document.getElementById('groupTitle').textContent = '第二组';
+                } else { 
+                    group = 'rule'; 
+                    explanationStyle = Math.random()<0.5?'indicator':'reason'; 
+                    document.getElementById('groupTitle').textContent = '第三组';
+                }
 
-                const gTitle = document.getElementById('groupTitle');
                 const gInst = document.getElementById('groupInstruction');
                 if (group === 'control') {
-                    gTitle.textContent = '控制组 · 无算法辅助';
                     gInst.innerHTML = '您只会看到案件信息，没有系统建议，请完全依据个人判断。';
                 } else if (group === 'tool') {
-                    gTitle.textContent = '工具组 · 风险分析助手';
                     gInst.innerHTML = '您会看到一个“风险分析助手”给出的建议，仅供参考，最终决定由您做出。';
                 } else {
-                    gTitle.textContent = '规则化他者组 · 上级部门评估系统';
                     gInst.innerHTML = '您会看到一个“上级部门重点督办评估系统”的建议，一般建议尽量与系统保持一致。';
                 }
                 document.getElementById('taskInstruction').innerHTML = '所有任务均为裁量决策任务，请先阅读上方的规则提示，再阅读案例并判断。';
@@ -783,8 +789,33 @@
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('submitExperiment').style.display = 'block';
                     if (confirm('上传失败，是否下载备份文件？')) {
-                        const backup = await submitData(); // 重新收集
-                        const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'});
+                        // 重新收集数据并下载
+                        const post = {
+                            trust: document.querySelector('input[name="trust"]:checked')?.value,
+                            fairness: document.querySelector('input[name="fairness"]:checked')?.value,
+                            responsibility: document.querySelector('input[name="responsibility"]:checked')?.value,
+                            willingness: document.querySelector('input[name="willingness"]:checked')?.value
+                        };
+                        const data = {
+                            participantId, group, explanationStyle,
+                            startTime: startTime?.toISOString(),
+                            endTime: new Date().toISOString(),
+                            demographics: {
+                                age: document.getElementById('age').value,
+                                gender: document.getElementById('gender').value,
+                                govExp: document.getElementById('govExp').value,
+                                aiExp: document.getElementById('aiExp').value
+                            },
+                            answers: questions.map((q,i) => ({
+                                caseNumber: q['案件编号'],
+                                participantDecision: answers[i],
+                                systemAdvice: group!=='control' ? getSystemAdvice(q['案件编号'], q['标准处理建议']) : null,
+                                correctAdvice: q['标准处理建议'],
+                                isErrorCase: isErrorCase(q['案件编号'])
+                            })),
+                            postQuestionnaire: post
+                        };
+                        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
                         const a = document.createElement('a');
                         a.href = URL.createObjectURL(blob);
                         a.download = `backup_${participantId}.json`;
