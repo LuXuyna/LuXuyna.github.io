@@ -648,7 +648,16 @@
             });
         }
 
-
+        function formatDateForMySQL(date) {
+            if (!date) return null;
+            const d = new Date(date);
+            return d.getFullYear() + '-' + 
+                   String(d.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(d.getDate()).padStart(2, '0') + ' ' + 
+                   String(d.getHours()).padStart(2, '0') + ':' + 
+                   String(d.getMinutes()).padStart(2, '0') + ':' + 
+                   String(d.getSeconds()).padStart(2, '0');
+        }
 
         // 提交数据到Flask后端（不再使用COS）
         async function submitData() {
@@ -663,8 +672,8 @@
                 participantId, 
                 group, 
                 explanationStyle,
-                startTime: startTime?.toISOString(),
-                endTime: new Date().toISOString(),
+                startTime: formatDateForMySQL(startTime),
+                endTime: formatDateForMySQL(new Date()),
                 demographics: {
                     age: document.getElementById('age').value,
                     gender: document.getElementById('gender').value,

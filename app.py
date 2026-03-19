@@ -10,20 +10,20 @@ app = Flask(__name__)
 DB_CONFIG = {
     'host': 'localhost',
     'port': 3306,
-    'user': 'Lu',        # 你在宝塔创建的数据库用户名
-    'password': '7wSpfA8AXByr6TTe',      # 你在宝塔设置的密码
-    'database': 'experiment', # 你在宝塔创建的数据库名
+    'user': 'Lu',
+    'password': '7wSpfA8AXByr6TTe',
+    'database': 'experiment',
     'charset': 'utf8mb4'
 }
 
-# 创建数据表
+# 创建数据表 + 自动添加4列错题字段
 def init_db():
-    """初始化数据库表"""
+    """初始化数据库表，并添加错题列"""
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         
-        # 创建实验数据表
+        # 创建主表
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS experiment_results (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,7 +42,21 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         """)
-        
+
+        # 自动添加4道错题列（不存在才添加，安全）
+        try:
+            cursor.execute("ALTER TABLE experiment_results ADD COLUMN error_case_1 INT DEFAULT NULL")
+        except: pass
+        try:
+            cursor.execute("ALTER TABLE experiment_results ADD COLUMN error_case_2 INT DEFAULT NULL")
+        except: pass
+        try:
+            cursor.execute("ALTER TABLE experiment_results ADD COLUMN error_case_3 INT DEFAULT NULL")
+        except: pass
+        try:
+            cursor.execute("ALTER TABLE experiment_results ADD COLUMN error_case_4 INT DEFAULT NULL")
+        except: pass
+
         conn.commit()
         cursor.close()
         conn.close()
@@ -58,12 +72,10 @@ def index():
 # 提供 cases.json 文件
 @app.route('/cases.json')
 def serve_cases():
-    """直接返回cases.json文件内容"""
     try:
         return send_from_directory('.', 'cases.json')
     except Exception as e:
         print(f"❌ 读取cases.json失败: {e}")
-        # 如果文件不存在，返回模拟数据
         mock_cases = [
             {
                 "案件编号": "C01", 
@@ -81,36 +93,47 @@ def serve_cases():
         ]
         return jsonify(mock_cases)
 
-# 提交数据接口
+# 提交数据接口（已完全修复）
 @app.route('/submit', methods=['POST'])
 def submit():
-    """接收前端提交的实验数据"""
     try:
         data = request.get_json()
-        
+
+        # 读取4道错题结果（前端已传过来）
+        error_case_1 = data.get('error_case_1')
+        error_case_2 = data.get('error_case_2')
+        error_case_3 = data.get('error_case_3')
+        error_case_4 = data.get('error_case_4')
+
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         
         sql = """
         INSERT INTO experiment_results 
         (participant_id, group_name, explanation_style, age, gender, government, 
-         gov_exp, ai_exp, answers, post_questionnaire, start_time, end_time)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        gov_exp, ai_exp, answers, post_questionnaire, start_time, end_time,
+        error_case_1, error_case_2, error_case_3, error_case_4
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         
         cursor.execute(sql, (
-            data.get('participantId'),
-            data.get('group'),
-            data.get('explanationStyle'),
-            data.get('demographics', {}).get('age'),
-            data.get('demographics', {}).get('gender'),
-            data.get('demographics', {}).get('government'),
-            data.get('demographics', {}).get('govExp'),
-            data.get('demographics', {}).get('aiExp'),
-            json.dumps(data.get('answers', []), ensure_ascii=False),
-            json.dumps(data.get('postQuestionnaire', {}), ensure_ascii=False),
-            data.get('startTime'),
-            data.get('endTime')
+            data.get('participant_id'),        # 已修复
+            data.get('group_name'),
+            data.get('explanation_style'),
+            data.get('age'),
+            data.get('gender'),
+            data.get('government'),
+            data.get('gov_exp'),
+            data.get('ai_exp'),
+            json.dumps(data.get('answers'), ensure_ascii=False),
+            json.dumps(data.get('post_questionnaire'), ensure_ascii=False),
+            data.get('start_time'),
+            data.get('end_time'),
+            error_case_1,                      # 已修复
+            error_case_2,
+            error_case_3,
+            error_case_4
         ))
         
         conn.commit()
@@ -123,10 +146,9 @@ def submit():
         print(f"❌ 提交数据错误: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
-# 查看数据接口（可选，方便调试）
+# 查看数据接口
 @app.route('/view-data')
 def view_data():
-    """查看已提交的数据（可选）"""
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor(pymysql.cursors.DictCursor)
